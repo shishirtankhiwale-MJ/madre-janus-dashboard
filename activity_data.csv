@@ -1,0 +1,17 @@
+employee,application,category,client,hours
+Shishir,Excel,Productive,ClientA,3
+Shishir,ChromeGST,Productive,ClientA,2
+Shishir,Tally,Productive,ClientB,2
+Shishir,YouTube,Non-Productive,None,1
+Akhil,Excel,Productive,ClientB,2
+Akhil,ChromeTax,Productive,ClientC,2
+Akhil,Instagram,Non-Productive,None,2
+Akhil,Outlook,Productive,Internal,2
+Jithesh,Excel,Productive,ClientA,2
+Jithesh,Tally,Productive,ClientB,2
+Jithesh,ChromeGST,Productive,ClientA,2
+Jithesh,YouTube,Non-Productive,None,2
+Anurag,Excel,Productive,ClientC,1
+Anurag,ChromeAudit,Productive,ClientD,2
+Anurag,Facebook,Non-Productive,None,3
+Anurag,Outlook,Productive,Internal,2

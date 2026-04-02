@@ -171,3 +171,143 @@ col6.success(
 col7.error(
     f"⚠️ Needs Attention: {low_employee['employee']} ({low_employee['productivity_score']:.1f}%)"
 )
+
+# ----------- DAILY PRODUCTIVITY SCORECARD -----------
+
+st.divider()
+st.title("📊 Daily Productivity Scorecard")
+
+scorecard = df.groupby("employee").apply(
+    lambda x: pd.Series({
+        "total_hours": x["hours"].sum(),
+        "productive_hours": x[x["category"] == "Productive"]["hours"].sum()
+    })
+).reset_index()
+
+scorecard["score"] = (
+    scorecard["productive_hours"] / scorecard["total_hours"]
+) * 100
+
+def get_status(score):
+    if score >= 80:
+        return "🔥 High Performer"
+    elif score >= 60:
+        return "👍 Average"
+    elif score >= 40:
+        return "⚠️ Low"
+    else:
+        return "🚨 Critical"
+
+scorecard["status"] = scorecard["score"].apply(get_status)
+scorecard["score"] = scorecard["score"].round(1)
+
+# Display Scorecard
+st.dataframe(scorecard)
+
+# Highlights
+top_emp = scorecard.sort_values(by="score", ascending=False).iloc[0]
+low_emp = scorecard.sort_values(by="score", ascending=True).iloc[0]
+
+col8, col9 = st.columns(2)
+
+col8.success(
+    f"🏆 Best Performer Today: {top_emp['employee']} ({top_emp['score']}%)"
+)
+
+col9.error(
+    f"⚠️ Needs Attention: {low_emp['employee']} ({low_emp['score']}%)"
+)
+# ----------- ADD TASK FORM -----------
+
+st.divider()
+st.subheader("➕ Add Compliance Task")
+
+with st.form("task_form"):
+    employee_input = st.selectbox("Select Employee", df["employee"].unique())
+    task_input = st.text_input("Task (e.g. GST Filing)")
+    client_input = st.text_input("Client Name")
+    deadline_input = st.date_input("Deadline")
+    status_input = st.selectbox("Status", ["Pending", "Completed"])
+
+    submit = st.form_submit_button("Add Task")
+
+    if submit:
+        new_data = pd.DataFrame([{
+            "employee": employee_input,
+            "task": task_input,
+            "client": client_input,
+            "deadline": deadline_input,
+            "status": status_input
+        }])
+
+        new_data.to_csv("compliance_data.csv", mode='a', header=False, index=False)
+
+        st.success("✅ Task Added Successfully!")
+# ----------- COMPLIANCE TRACKER -----------
+
+import datetime
+
+st.divider()
+st.title("📅 Compliance Tracker")
+
+comp_df = pd.read_csv("compliance_data.csv")
+
+# Convert date
+comp_df["deadline"] = pd.to_datetime(comp_df["deadline"])
+today = pd.to_datetime(datetime.date.today())
+
+# Status classification
+pending = comp_df[comp_df["status"] == "Pending"]
+completed = comp_df[comp_df["status"] == "Completed"]
+overdue = pending[pending["deadline"] < today]
+
+# ----------- SUMMARY CARDS -----------
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("📌 Pending Tasks", len(pending))
+col2.metric("✅ Completed Tasks", len(completed))
+col3.metric("🚨 Overdue Tasks", len(overdue))
+# ----------- COMPLIANCE ALERT SYSTEM -----------
+
+st.subheader("🚨 Compliance Alerts")
+
+# Due in next 2 days
+due_soon = pending[
+    (pending["deadline"] >= today) &
+    (pending["deadline"] <= today + pd.Timedelta(days=2))
+]
+
+# ----------- ALERT DISPLAY -----------
+
+if len(overdue) > 0:
+    st.error(f"🚨 {len(overdue)} Overdue Tasks! Immediate action required")
+
+if len(due_soon) > 0:
+    st.warning(f"⏳ {len(due_soon)} Tasks due in next 2 days")
+
+if len(overdue) == 0 and len(due_soon) == 0:
+    st.success("✅ All compliance tasks are under control")
+
+# ----------- OVERDUE -----------
+
+st.subheader("🚨 Overdue Tasks")
+
+if len(overdue) > 0:
+    st.dataframe(overdue)
+else:
+    st.success("No overdue tasks")
+
+# ----------- UPCOMING -----------
+
+st.subheader("⏳ Upcoming Tasks")
+
+upcoming = pending[pending["deadline"] >= today]
+
+st.dataframe(upcoming)
+
+# ----------- ALL TASKS -----------
+
+st.subheader("📋 All Compliance Tasks")
+
+st.dataframe(comp_df)

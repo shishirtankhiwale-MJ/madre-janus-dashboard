@@ -1,8 +1,8 @@
 employee,application,category,client,hours
-Shishir,Excel,Productive,ClientA,3
-Shishir,ChromeGST,Productive,ClientA,2
-Shishir,Tally,Productive,ClientB,2
-Shishir,YouTube,Non-Productive,None,1
+Stanley,Excel,Productive,ClientA,3
+Stanley,ChromeGST,Productive,ClientA,2
+Stanley,Tally,Productive,ClientB,2
+Stanley,YouTube,Non-Productive,None,1
 Akhil,Excel,Productive,ClientB,2
 Akhil,ChromeTax,Productive,ClientC,2
 Akhil,Instagram,Non-Productive,None,2
